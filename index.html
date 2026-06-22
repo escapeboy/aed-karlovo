@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Дефибрилатори (AED) — Община Карлово</title>
+<meta name="description" content="Карта на автоматичните външни дефибрилатори (AED) в Община Карлово. При спешност звъни 112.">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root{
+    --aed:#008a3e; --aed-d:#006e31;
+    --ink:#14201a; --muted:#5b6b62;
+    --surface:#fff; --bg:#f3f6f3; --line:#e3e8e4;
+    --emergency:#d6201f; --emergency-d:#b01716;
+    --focus:#1a73e8;
+    --r:12px; --shadow:0 1px 3px rgba(20,32,26,.12),0 6px 16px rgba(20,32,26,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background:var(--bg);
+    -webkit-text-size-adjust:100%;
+    display:flex; flex-direction:column; min-height:100dvh;
+  }
+  a{color:inherit}
+
+  /* Emergency bar — the one place red is allowed */
+  .er{
+    display:flex; align-items:center; gap:10px;
+    background:var(--emergency); color:#fff;
+    padding:10px max(14px,env(safe-area-inset-right)) 10px max(14px,env(safe-area-inset-left));
+    text-decoration:none; font-weight:700; letter-spacing:.2px;
+  }
+  .er:hover{background:var(--emergency-d)}
+  .er svg{flex:0 0 auto}
+  .er b{font-size:1.05rem}
+  .er span{font-weight:500; opacity:.92; font-size:.85rem}
+  .er .arrow{margin-left:auto; font-size:1.1rem}
+
+  header{
+    padding:12px 14px 10px; background:var(--surface); border-bottom:1px solid var(--line);
+  }
+  header h1{margin:0; font-size:1.05rem; line-height:1.25; font-weight:700}
+  header p{margin:2px 0 0; color:var(--muted); font-size:.82rem}
+
+  .layout{flex:1; display:flex; min-height:0}
+  #map{flex:1; min-height:240px; background:#dfe6e0}
+  .panel{
+    width:100%; background:var(--surface); border-top:1px solid var(--line);
+    display:flex; flex-direction:column; min-height:0;
+  }
+  .panel-head{padding:10px 14px; display:flex; gap:8px; align-items:center; border-bottom:1px solid var(--line)}
+  .near{
+    flex:1; appearance:none; border:1px solid var(--aed); background:var(--aed); color:#fff;
+    font:inherit; font-weight:600; padding:10px 12px; border-radius:var(--r); cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .near:hover{background:var(--aed-d); border-color:var(--aed-d)}
+  .near:disabled{opacity:.6; cursor:progress}
+  .count{color:var(--muted); font-size:.8rem; white-space:nowrap}
+
+  ul.list{list-style:none; margin:0; padding:8px; overflow:auto; -webkit-overflow-scrolling:touch}
+  li.card{
+    border:1px solid var(--line); border-radius:var(--r); padding:12px; margin:6px 2px;
+    background:var(--surface); box-shadow:var(--shadow);
+  }
+  li.card.active{border-color:var(--aed); box-shadow:0 0 0 2px rgba(0,138,62,.18),var(--shadow)}
+  .card-top{display:flex; gap:10px; align-items:flex-start}
+  .pin{flex:0 0 auto; margin-top:1px}
+  .card h2{margin:0; font-size:.98rem; font-weight:700; line-height:1.2}
+  .card .city{color:var(--muted); font-weight:500}
+  .card .meta{margin:3px 0 0; color:var(--muted); font-size:.84rem; line-height:1.35}
+  .card .dist{margin-left:auto; flex:0 0 auto; font-size:.8rem; font-weight:600; color:var(--aed-d); white-space:nowrap}
+  .card .todo{color:#9a6a00}
+  .actions{display:flex; gap:8px; margin-top:10px}
+  .btn{
+    flex:1; appearance:none; text-decoration:none; text-align:center; font:inherit; font-weight:600;
+    padding:10px; border-radius:10px; cursor:pointer; border:1px solid var(--line); background:var(--bg); color:var(--ink);
+  }
+  .btn.primary{background:var(--aed); border-color:var(--aed); color:#fff}
+  .btn.primary:hover{background:var(--aed-d)}
+  .btn:hover{background:#eef2ef}
+
+  :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:6px}
+
+  /* Custom AED marker */
+  .aed-mark{display:grid; place-items:center}
+  .aed-mark svg{filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+
+  .leaflet-popup-content{margin:12px 14px; font:inherit}
+  .leaflet-popup-content h2{margin:0 0 4px; font-size:.98rem}
+  .leaflet-popup-content .meta{color:var(--muted); font-size:.84rem; margin:2px 0}
+  .leaflet-popup-content a.nav{
+    display:inline-block; margin-top:8px; background:var(--aed); color:#fff;
+    text-decoration:none; padding:8px 12px; border-radius:10px; font-weight:600;
+  }
+
+  /* Desktop: map + sidebar */
+  @media (min-width:880px){
+    .layout{flex-direction:row}
+    #map{order:1}
+    .panel{order:2; width:380px; border-top:0; border-left:1px solid var(--line)}
+  }
+  @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+
+<a class="er" href="tel:112" aria-label="Обади се на спешния телефон 112">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.58 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.58 3.6a1 1 0 01-.24 1l-2.24 2.2z" fill="currentColor"/>
+  </svg>
+  <span style="display:flex;flex-direction:column;line-height:1.1">
+    <b>Спешен телефон 112</b>
+    <span>Натисни при сърдечен арест</span>
+  </span>
+  <span class="arrow" aria-hidden="true">›</span>
+</a>
+
+<header>
+  <h1>Дефибрилатори (AED) — Община Карлово</h1>
+  <p>Публично достъпни автоматични външни дефибрилатори. Винаги първо звъни <strong>112</strong>.</p>
+</header>
+
+<div class="layout">
+  <div id="map" role="application" aria-label="Карта на дефибрилаторите"></div>
+  <aside class="panel" aria-label="Списък на дефибрилаторите">
+    <div class="panel-head">
+      <button class="near" id="near" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>
+        Най-близкият до мен
+      </button>
+      <span class="count" id="count"></span>
+    </div>
+    <ul class="list" id="list" aria-live="polite"></ul>
+  </aside>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  "use strict";
+  var DATA = "data/defibrillators.geojson";
+  var CENTER = [42.6433, 24.8056], ZOOM = 13;
+
+  var map = L.map("map", {scrollWheelZoom:true}).setView(CENTER, ZOOM);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom:19,
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  // Green AED pin with white heart
+  var ICON = L.divIcon({
+    className:"aed-mark", iconSize:[34,42], iconAnchor:[17,42], popupAnchor:[0,-38],
+    html:'<svg width="34" height="42" viewBox="0 0 34 42" xmlns="http://www.w3.org/2000/svg">'
+      +'<path d="M17 1C8.7 1 2 7.6 2 15.7 2 26 17 41 17 41s15-15 15-25.3C32 7.6 25.3 1 17 1z" fill="#008a3e" stroke="#fff" stroke-width="2"/>'
+      +'<path d="M17 25.5l-5.6-5.3c-1.9-1.8-1.9-4.7 0-6.5 1.7-1.6 4.4-1.4 6 .3l-.4 0 .4 0c1.6-1.7 4.3-1.9 6-.3 1.9 1.8 1.9 4.7 0 6.5L17 25.5z" fill="#fff"/>'
+      +'</svg>'
+  });
+
+  var listEl = document.getElementById("list");
+  var countEl = document.getElementById("count");
+  var nearBtn = document.getElementById("near");
+  var points = []; // {name, city, address, access, hours, lat, lng, marker, li}
+  var userPos = null;
+
+  function esc(s){ return (s||"").replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  function navUrl(lat,lng){
+    return "https://www.google.com/maps/dir/?api=1&destination="+lat+","+lng;
+  }
+
+  function haversine(a,b,c,d){
+    var R=6371000, t=Math.PI/180;
+    var dLat=(c-a)*t, dLng=(d-b)*t;
+    var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*t)*Math.cos(c*t)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return 2*R*Math.asin(Math.sqrt(x));
+  }
+  function fmtDist(m){
+    if(m<1000) return Math.round(m)+" м";
+    return (m/1000).toFixed(m<10000?1:0)+" км";
+  }
+
+  function popupHtml(p){
+    var h = "<h2>"+esc(p.name)+"</h2>";
+    h += '<div class="meta">'+esc(p.city)+", "+esc(p.address)+"</div>";
+    if(p.access) h += '<div class="meta">Местоположение: '+esc(p.access)+"</div>";
+    if(p.hours)  h += '<div class="meta">Достъп: '+esc(p.hours)+"</div>";
+    h += '<a class="nav" target="_blank" rel="noopener" href="'+navUrl(p.lat,p.lng)+'">Навигирай</a>';
+    return h;
+  }
+
+  function cardHtml(p){
+    var meta = esc(p.city)+", "+esc(p.address);
+    if(p.hours) meta += "<br>Достъп: "+esc(p.hours);
+    if(p.access) meta += "<br>Местоположение: "+esc(p.access);
+    else meta += '<br><span class="todo">Точното място в обекта — да се уточни</span>';
+    return ''
+      +'<div class="card-top">'
+      +'  <span class="pin"><svg width="18" height="22" viewBox="0 0 34 42"><path d="M17 1C8.7 1 2 7.6 2 15.7 2 26 17 41 17 41s15-15 15-25.3C32 7.6 25.3 1 17 1z" fill="#008a3e"/><path d="M17 25.5l-5.6-5.3c-1.9-1.8-1.9-4.7 0-6.5 1.7-1.6 4.4-1.4 6 .3 1.6-1.7 4.3-1.9 6-.3 1.9 1.8 1.9 4.7 0 6.5L17 25.5z" fill="#fff"/></svg></span>'
+      +'  <div style="flex:1;min-width:0"><h2>'+esc(p.name)+' <span class="city">· '+esc(p.city)+'</span></h2>'
+      +'  <div class="meta">'+meta+'</div></div>'
+      +'  <span class="dist" data-dist></span>'
+      +'</div>'
+      +'<div class="actions">'
+      +'  <a class="btn primary" target="_blank" rel="noopener" href="'+navUrl(p.lat,p.lng)+'">Навигирай</a>'
+      +'  <button class="btn" type="button" data-focus>Покажи на картата</button>'
+      +'</div>';
+  }
+
+  function focusPoint(p){
+    points.forEach(function(q){ q.li.classList.toggle("active", q===p); });
+    map.setView([p.lat,p.lng], 17, {animate:true});
+    p.marker.openPopup();
+    p.li.scrollIntoView({block:"nearest"});
+  }
+
+  function render(){
+    listEl.innerHTML = "";
+    points.forEach(function(p){
+      var li = document.createElement("li");
+      li.className = "card";
+      li.innerHTML = cardHtml(p);
+      li.querySelector("[data-focus]").addEventListener("click", function(){ focusPoint(p); });
+      p.li = li;
+      p.distEl = li.querySelector("[data-dist]");
+      listEl.appendChild(li);
+    });
+    countEl.textContent = points.length + " точки";
+    if(userPos) applyDistances();
+  }
+
+  function applyDistances(){
+    points.forEach(function(p){
+      p.dist = haversine(userPos[0],userPos[1],p.lat,p.lng);
+      p.distEl.textContent = fmtDist(p.dist);
+    });
+    points.sort(function(a,b){ return a.dist-b.dist; });
+    points.forEach(function(p){ listEl.appendChild(p.li); });
+  }
+
+  nearBtn.addEventListener("click", function(){
+    if(!navigator.geolocation){ alert("Браузърът не поддържа геолокация."); return; }
+    nearBtn.disabled = true; nearBtn.textContent = "Локализиране…";
+    navigator.geolocation.getCurrentPosition(function(pos){
+      userPos = [pos.coords.latitude, pos.coords.longitude];
+      L.circleMarker(userPos,{radius:7,color:"#1a73e8",weight:3,fillColor:"#1a73e8",fillOpacity:.5})
+        .addTo(map).bindPopup("Вашето местоположение");
+      applyDistances();
+      var nearest = points[0];
+      map.setView(userPos, 14);
+      focusPoint(nearest);
+      nearBtn.disabled=false; nearBtn.innerHTML="Най-близкият до мен";
+    }, function(){
+      alert("Не успяхме да вземем местоположението. Разреши достъпа в браузъра.");
+      nearBtn.disabled=false; nearBtn.innerHTML="Най-близкият до мен";
+    }, {enableHighAccuracy:true, timeout:10000});
+  });
+
+  fetch(DATA, {cache:"no-cache"})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(geo){
+      var bounds = [];
+      geo.features.forEach(function(f){
+        var c = f.geometry.coordinates, pr = f.properties;
+        var p = {name:pr.name, city:pr.city||"", address:pr.address||"",
+                 access:pr.access||"", hours:pr.hours||"", lat:c[1], lng:c[0]};
+        p.marker = L.marker([p.lat,p.lng], {icon:ICON, title:p.name})
+          .addTo(map).bindPopup(popupHtml(p));
+        p.marker.on("click", function(){ points.forEach(function(q){ q.li && q.li.classList.toggle("active", q===p); }); });
+        points.push(p); bounds.push([p.lat,p.lng]);
+      });
+      render();
+      if(bounds.length) map.fitBounds(bounds, {padding:[40,40], maxZoom:15});
+    })
+    .catch(function(e){
+      listEl.innerHTML = '<li class="card">Данните не се заредиха ('+esc(String(e.message))+'). Презареди страницата.</li>';
+    });
+})();
+</script>
+</body>
+</html>
