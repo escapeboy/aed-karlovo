@@ -1,12 +1,12 @@
 /* AED Карлово — service worker: offline shell + data + map tiles */
-const VERSION = "aed-v6";
+const VERSION = "aed-v7";
 const SHELL = "aed-shell-" + VERSION;
 const DATA  = "aed-data-"  + VERSION;
 const TILES = "aed-tiles-" + VERSION;
 const TILE_MAX = 350; // keep the tile cache bounded
 
 const SHELL_ASSETS = [
-  "/", "/index.html", "/pomosht.html", "/manifest.webmanifest",
+  "/", "/pomosht", "/manifest.webmanifest",
   "/favicon.svg", "/favicon-32.png",
   "/img/compression.jpg", "/img/aed-pads.png", "/img/recovery.jpg",
   "/img/choke-backblows.jpg", "/img/choke-heimlich.jpg",
@@ -87,7 +87,7 @@ self.addEventListener("fetch", function(e){
         return fresh;
       } catch (_) {
         // offline: serve the same page from cache; only as a last resort fall back to the map
-        return (await caches.match(req)) || (await caches.match("/index.html")) || (await caches.match("/")) || Response.error();
+        return (await caches.match(req)) || (await caches.match("/")) || Response.error();
       }
     })());
     return;
