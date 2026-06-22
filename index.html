@@ -362,13 +362,18 @@
 
   function focusPoint(p){
     points.forEach(function(q){ q.li.classList.toggle("active", q===p); });
-    map.setView([p.lat,p.lng], 17, {animate:true});
-    p.marker.openPopup();
-    p.li.scrollIntoView({block:"nearest"});
-    // On phones the map sits above the list — bring it into view after a pick
-    if(window.matchMedia("(max-width:879px)").matches){
+    var mobile = window.matchMedia("(max-width:879px)").matches;
+    // On phones the map sits above the list — bring it into view first
+    if(mobile){
       document.getElementById("map").scrollIntoView({behavior:"smooth", block:"start"});
     }
+    // Center the marker, nudged just below centre so its popup (opens upward) stays
+    // fully visible without Leaflet shoving the marker to the bottom edge.
+    var z = 17, offsetY = mobile ? 45 : 30;
+    var pt = map.project([p.lat,p.lng], z).subtract([0, offsetY]);
+    map.setView(map.unproject(pt, z), z, {animate:true});
+    p.marker.openPopup();
+    p.li.scrollIntoView({block:"nearest"});
   }
 
   function render(){
@@ -423,7 +428,7 @@
         var p = {name:pr.name, city:pr.city||"", address:pr.address||"",
                  access:pr.access||"", hours:pr.hours||"", lat:c[1], lng:c[0]};
         p.marker = L.marker([p.lat,p.lng], {icon:ICON, title:p.name})
-          .addTo(map).bindPopup(popupHtml(p));
+          .addTo(map).bindPopup(popupHtml(p), {autoPan:false});
         p.marker.on("click", function(){ points.forEach(function(q){ q.li && q.li.classList.toggle("active", q===p); }); });
         points.push(p); bounds.push([p.lat,p.lng]);
       });
