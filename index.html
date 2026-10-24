@@ -221,16 +221,28 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="/consent.css">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HKSBELEELY"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied'});
+  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500});
+</script>
+<script src="/consent.js"></script>
+<script>
   gtag('js', new Date());
   gtag('config', 'G-HKSBELEELY', {page_location: location.origin + location.pathname, page_referrer: document.referrer ? new URL(document.referrer).origin + '/' : ''});
 </script>
 </head>
 <body>
+
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-label="Бисквитки" hidden>
+  <p>Използваме бисквитки на Google Analytics, за да броим посещенията. Те се включват само ако се съгласиш. <a href="/biskvitki">Повече за бисквитките</a></p>
+  <div class="cookie-actions">
+    <button type="button" id="cookieAccept">Приемам</button>
+    <button type="button" id="cookieReject">Отказвам</button>
+  </div>
+</div>
 
 <div id="splash" role="status" aria-label="Зареждане">
   <svg width="92" height="92" viewBox="0 0 34 42" aria-hidden="true">
@@ -284,6 +296,8 @@
     <ul class="list" id="list" aria-live="polite"></ul>
   </aside>
 </div>
+
+<footer class="cookie-foot"><a href="/biskvitki">Бисквитки</a> · <button type="button" class="cookie-link" data-cookie-settings>Настройки за бисквитки</button></footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>

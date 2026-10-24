@@ -168,16 +168,28 @@
     .print-url::after{content:" (" attr(href) ")"; font-size:9pt; color:#000}
   }
 </style>
+<link rel="stylesheet" href="/consent.css">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HKSBELEELY"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied'});
+  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500});
+</script>
+<script src="/consent.js"></script>
+<script>
   gtag('js', new Date());
   gtag('config', 'G-HKSBELEELY', {page_location: location.origin + location.pathname, page_referrer: document.referrer ? new URL(document.referrer).origin + '/' : ''});
 </script>
 </head>
 <body>
+
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-label="Бисквитки" hidden>
+  <p>Използваме бисквитки на Google Analytics, за да броим посещенията. Те се включват само ако се съгласиш. <a href="/biskvitki">Повече за бисквитките</a></p>
+  <div class="cookie-actions">
+    <button type="button" id="cookieAccept">Приемам</button>
+    <button type="button" id="cookieReject">Отказвам</button>
+  </div>
+</div>
 
 <a class="er" href="tel:112" aria-label="Обади се на спешния телефон 112">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -490,6 +502,7 @@
   <p>Препратки: <a class="print-url" href="https://www.erc.edu/science-research/guidelines/guidelines-2025" target="_blank" rel="noopener">ERC Guidelines 2025</a> · <a class="print-url" href="https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-basic-life-support-guidelines" target="_blank" rel="noopener">Adult BLS (Resuscitation Council UK, ERC-съгласувани)</a>.</p>
   <p><b>Изображения</b> (свободни лицензи, без промени по техниката): компресии — OpenStax, <i>Anatomy &amp; Physiology</i>, <a class="print-url" href="https://commons.wikimedia.org/wiki/File:2002_CPR_Technique.jpg" target="_blank" rel="noopener">CC BY 3.0</a>; AED пластини — BruceBlaus, <a class="print-url" href="https://commons.wikimedia.org/wiki/File:Automated_External_Defibrillator.png" target="_blank" rel="noopener">CC BY-SA 4.0</a>; възстановително положение — U.S. Army, обществено достояние, <a class="print-url" href="https://commons.wikimedia.org/wiki/File:Coma_Position.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>; удари по гръбчето — Trakotako, <a class="print-url" href="https://commons.wikimedia.org/wiki/File:Back_blows_(back_slaps)_against_choking_for_adult_people.jpg" target="_blank" rel="noopener">CC BY-SA 4.0</a>; коремни тласъци (Хаймлих) — U.S. Army, обществено достояние, <a class="print-url" href="https://commons.wikimedia.org/wiki/File:Abdominal_thrusts_against_choking.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>. Блок-схемата на BLS е собствена.</p>
   <p>Сверено на 22.06.2026.</p>
+  <p><a href="/biskvitki">Бисквитки</a> · <button type="button" class="cookie-link" data-cookie-settings>Настройки за бисквитки</button></p>
 </footer>
 
 <script>

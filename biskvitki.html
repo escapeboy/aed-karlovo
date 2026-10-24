@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Бисквитки · AED Карлово</title>
+<meta name="description" content="Как AED Карлово използва бисквитки на Google Analytics и как можеш да промениш избора си.">
+<link rel="canonical" href="https://aed.karlovo.net/biskvitki">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#008a3e">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<style>
+  body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:#14201a; background:#f3f6f3; line-height:1.55}
+  main{max-width:720px; margin:0 auto; padding:24px 14px 80px}
+  h1{font-size:1.5rem; margin:0 0 12px}
+  h2{font-size:1.1rem; margin:22px 0 6px}
+  a{color:#006e31}
+  code{background:#e8eee9; padding:1px 5px; border-radius:4px}
+  table{border-collapse:collapse; width:100%; font-size:.92rem; background:#fff}
+  th,td{border:1px solid #e3e8e4; padding:6px 8px; text-align:left; vertical-align:top}
+  :focus-visible{outline:3px solid #1a73e8; outline-offset:2px; border-radius:4px}
+</style>
+<link rel="stylesheet" href="/consent.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HKSBELEELY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500});
+</script>
+<script src="/consent.js"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-HKSBELEELY', {page_location: location.origin + location.pathname, page_referrer: document.referrer ? new URL(document.referrer).origin + '/' : ''});
+</script>
+</head>
+<body>
+
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-label="Бисквитки" hidden>
+  <p>Използваме бисквитки на Google Analytics, за да броим посещенията. Те се включват само ако се съгласиш. <a href="/biskvitki">Повече за бисквитките</a></p>
+  <div class="cookie-actions">
+    <button type="button" id="cookieAccept">Приемам</button>
+    <button type="button" id="cookieReject">Отказвам</button>
+  </div>
+</div>
+
+<main>
+  <p><a href="/">← Към картата с дефибрилаторите</a></p>
+  <h1>Бисквитки</h1>
+  <p>Сайтът AED Карлово не изисква регистрация и не събира лични данни. Единствените бисквитки са тези на Google Analytics 4 и се поставят само след като натиснеш „Приемам“. Ако натиснеш „Отказвам“ или не избереш нищо, не се поставя нито една бисквитка на Google Analytics.</p>
+
+  <h2>Какво се поставя след „Приемам“</h2>
+  <table>
+    <thead><tr><th>Бисквитка</th><th>Цел</th><th>Срок</th></tr></thead>
+    <tbody>
+      <tr><td><code>_ga</code></td><td>Анонимна статистика за посещенията</td><td>до 13 месеца</td></tr>
+      <tr><td><code>_ga_HKSBELEELY</code></td><td>Анонимна статистика за посещенията (състояние на сесията)</td><td>до 13 месеца</td></tr>
+    </tbody>
+  </table>
+  <p>Доставчик: Google Ireland Ltd. Данните в Google Analytics се пазят 14 месеца. Рекламни бисквитки и персонализация на реклами не се използват и никога не се включват.</p>
+
+  <h2>Как се пази изборът ти</h2>
+  <p>Изборът се записва в браузъра ти (<code>localStorage</code>, ключ <code>cookie_consent</code>) и важи 12 месеца. След това ще те попитаме отново.</p>
+
+  <h2>Как да промениш избора си</h2>
+  <p>Можеш да се откажеш по всяко време през „Настройки за бисквитки“ в долната част на страницата. При отказ изтриваме бисквитките <code>_ga</code> и <code>_ga_*</code>.</p>
+  <p><button type="button" class="cookie-link" data-cookie-settings>Настройки за бисквитки</button></p>
+</main>
+
+</body>
+</html>
